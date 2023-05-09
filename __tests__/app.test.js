@@ -46,3 +46,42 @@ describe("/api/categories", () => {
     });
   });
 });
+
+describe("/api/reviews/:review_id", () => {
+  describe("GET", () => {
+    test("responds with review object with correct properties and status 200", () => {
+      return request(app)
+        .get("/api/reviews/1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.review.review_id).toBe(1);
+          expect(body.review.title).toBe("Agricola");
+          expect(body.review.review_body).toBe("Farmyard fun!");
+          expect(body.review.designer).toBe("Uwe Rosenberg");
+          expect(body.review.review_img_url).toBe(
+            "https://images.pexels.com/photos/974314/pexels-photo-974314.jpeg?w=700&h=700"
+          );
+          expect(body.review.votes).toBe(1);
+          expect(body.review.category).toBe("euro game");
+          expect(body.review.owner).toBe("mallionaire");
+          expect(body.review.created_at).toBe("2021-01-18T10:00:20.514Z");
+        });
+    });
+    test("if invalid review_id given, gives 400 error and returns error message", () => {
+      return request(app)
+        .get("/api/reviews/hello")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid request!");
+        });
+    });
+    test("if valid out of range review_id given, gives a 404 error and review not found message", () => {
+      return request(app)
+        .get("/api/reviews/10000")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("review not found!");
+        });
+    });
+  });
+});
