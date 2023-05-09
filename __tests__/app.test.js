@@ -13,8 +13,13 @@ beforeEach(() => seed({ categoryData, commentData, reviewData, userData }));
 afterAll(() => db.end());
 
 describe("GET", () => {
-  test("If filepath is invalid, returns 404 not found", () => {
-    return request(app).get("/hello").expect(404);
+  test("If filepath is invalid, returns 404 not found and error message", () => {
+    return request(app)
+      .get("/hello")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
   });
 });
 
@@ -33,12 +38,10 @@ describe("/api/categories", () => {
         .get("/api/categories")
         .expect(200)
         .then(({ body }) => {
-          body.categories.forEach(category => {
+          body.categories.forEach((category) => {
             expect(typeof category.slug).toBe("string");
-            expect(typeof category.description).toBe(
-              "string"
-            );
-          })
+            expect(typeof category.description).toBe("string");
+          });
         });
     });
   });
