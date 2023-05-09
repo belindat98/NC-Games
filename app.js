@@ -5,4 +5,4 @@ const app = express();
 
 app.get("/api/categories", getCategories);
 
-module.exports = {app}
+module.exports = { app };
