@@ -5,7 +5,5 @@ exports.getAPI = (req, res, next) => {
     .then((endpoints) => {
       res.status(200).send(JSON.parse(endpoints));
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch(next);
 };
