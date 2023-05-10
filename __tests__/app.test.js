@@ -1,6 +1,7 @@
 const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const request = require("supertest");
+const fs = require('fs/promises');
 const { app } = require("../app");
 const {
   categoryData,
@@ -46,6 +47,21 @@ describe("/api/categories", () => {
     });
   });
 });
+
+describe("/api", () => {
+    describe("GET", () => {
+        test("returns JSON describing all available endpoints on API", () => {
+            return request(app)
+            .get("/api")
+            .then(({body}) => {
+                return Promise.all([body, fs.readFile(`${__dirname}/../endpoints.json`,"utf8")])
+            })
+            .then(([body, endpoints]) => {
+                expect(body).toEqual(JSON.parse(endpoints))
+            })
+        })
+    })
+})
 
 describe("/api/reviews/:review_id", () => {
   describe("GET", () => {

@@ -1,11 +1,14 @@
 const express = require("express");
 const { getCategories } = require("./controllers/categories.controllers");
+const { getAPI } = require("./controllers/api.controllers");
 const { getReviewById } = require("./controllers/reviews.controllers");
 const { handleCustomErrors, handlePsqlErrors } = require("./errorHandlers");
 
 const app = express();
 
 app.get("/api/categories", getCategories);
+
+app.get("/api", getAPI);
 
 app.get("/api/reviews/:review_id", getReviewById);
 
