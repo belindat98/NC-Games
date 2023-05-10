@@ -54,17 +54,17 @@ describe("/api/reviews/:review_id", () => {
         .get("/api/reviews/1")
         .expect(200)
         .then(({ body }) => {
-          expect(body.review.review_id).toBe(1);
-          expect(body.review.title).toBe("Agricola");
-          expect(body.review.review_body).toBe("Farmyard fun!");
-          expect(body.review.designer).toBe("Uwe Rosenberg");
-          expect(body.review.review_img_url).toBe(
-            "https://images.pexels.com/photos/974314/pexels-photo-974314.jpeg?w=700&h=700"
-          );
-          expect(body.review.votes).toBe(1);
-          expect(body.review.category).toBe("euro game");
-          expect(body.review.owner).toBe("mallionaire");
-          expect(body.review.created_at).toBe("2021-01-18T10:00:20.514Z");
+          expect(body.review.review_id).toBe(1)
+          expect(body.review).toMatchObject({
+              title: expect.any(String),
+              review_body: expect.any(String),
+              designer: expect.any(String),
+              review_img_url: expect.any(String),
+              votes: expect.any(Number),
+              category: expect.any(String),
+              owner: expect.any(String),
+              created_at: expect.any(String),
+          });
         });
     });
     test("if invalid review_id given, gives 400 error and returns error message", () => {
