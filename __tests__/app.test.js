@@ -62,3 +62,42 @@ describe("/api", () => {
         })
     })
 })
+
+describe("/api/reviews/:review_id", () => {
+  describe("GET", () => {
+    test("responds with review object with correct properties and status 200", () => {
+      return request(app)
+        .get("/api/reviews/1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.review.review_id).toBe(1)
+          expect(body.review).toMatchObject({
+              title: expect.any(String),
+              review_body: expect.any(String),
+              designer: expect.any(String),
+              review_img_url: expect.any(String),
+              votes: expect.any(Number),
+              category: expect.any(String),
+              owner: expect.any(String),
+              created_at: expect.any(String),
+          });
+        });
+    });
+    test("if invalid review_id given, gives 400 error and returns error message", () => {
+      return request(app)
+        .get("/api/reviews/hello")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid request!");
+        });
+    });
+    test("if valid out of range review_id given, gives a 404 error and review not found message", () => {
+      return request(app)
+        .get("/api/reviews/10000")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("review not found!");
+        });
+    });
+  });
+});
