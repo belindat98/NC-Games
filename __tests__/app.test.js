@@ -1,7 +1,7 @@
 const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const request = require("supertest");
-const fs = require('fs/promises');
+const fs = require("fs/promises");
 const { app } = require("../app");
 const {
   categoryData,
@@ -49,19 +49,22 @@ describe("/api/categories", () => {
 });
 
 describe("/api", () => {
-    describe("GET", () => {
-        test("returns JSON describing all available endpoints on API", () => {
-            return request(app)
-            .get("/api")
-            .then(({body}) => {
-                return Promise.all([body, fs.readFile(`${__dirname}/../endpoints.json`,"utf8")])
-            })
-            .then(([body, endpoints]) => {
-                expect(body).toEqual(JSON.parse(endpoints))
-            })
+  describe("GET", () => {
+    test("returns JSON describing all available endpoints on API", () => {
+      return request(app)
+        .get("/api")
+        .then(({ body }) => {
+          return Promise.all([
+            body,
+            fs.readFile(`${__dirname}/../endpoints.json`, "utf8"),
+          ]);
         })
-    })
-})
+        .then(([body, endpoints]) => {
+          expect(body).toEqual(JSON.parse(endpoints));
+        });
+    });
+  });
+});
 
 describe("/api/reviews/:review_id", () => {
   describe("GET", () => {
@@ -70,16 +73,16 @@ describe("/api/reviews/:review_id", () => {
         .get("/api/reviews/1")
         .expect(200)
         .then(({ body }) => {
-          expect(body.review.review_id).toBe(1)
+          expect(body.review.review_id).toBe(1);
           expect(body.review).toMatchObject({
-              title: expect.any(String),
-              review_body: expect.any(String),
-              designer: expect.any(String),
-              review_img_url: expect.any(String),
-              votes: expect.any(Number),
-              category: expect.any(String),
-              owner: expect.any(String),
-              created_at: expect.any(String),
+            title: expect.any(String),
+            review_body: expect.any(String),
+            designer: expect.any(String),
+            review_img_url: expect.any(String),
+            votes: expect.any(Number),
+            category: expect.any(String),
+            owner: expect.any(String),
+            created_at: expect.any(String),
           });
         });
     });
@@ -99,5 +102,40 @@ describe("/api/reviews/:review_id", () => {
           expect(body.msg).toBe("review not found!");
         });
     });
+  });
+});
+
+describe("/api/reviews", () => {
+  describe("GET", () => {
+    test("responds with array of review objects with correct properties and status 200", () => {
+      return request(app)
+        .get("/api/reviews")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.reviews.length).toBe(13);
+          body.reviews.forEach((review) => {
+            expect(review).toMatchObject({
+              owner: expect.any(String),
+              title: expect.any(String),
+              review_id: expect.any(Number),
+              category: expect.any(String),
+              review_img_url: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              designer: expect.any(String),
+              comment_count: expect.any(String)
+            });
+            expect(review).not.toHaveProperty("review_body")
+          });
+        });
+    });
+    test("reviews are sorted by date in descending order", () => {
+      return request(app)
+        .get("/api/reviews")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.reviews).toBeSortedBy("created_at", {descending: true})
+        })
+    })
   });
 });
