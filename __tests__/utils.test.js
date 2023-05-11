@@ -3,6 +3,8 @@ const {
 	createRef,
 	formatComments,
 } = require("../db/seeds/utils");
+const { checkExists } = require("../utils/utils");
+
 
 describe("convertTimestampToDate", () => {
 	test("returns a new object", () => {
@@ -102,3 +104,19 @@ describe("formatComments", () => {
 		expect(formattedComments[0].created_at).toEqual(new Date(timestamp));
 	});
 });
+
+describe("checkExists()", () => {
+	test("when passed a valid review id that does not exist, returns an error message", () => {
+		const testReviewExists = checkExists('reviews', 'review_id', 1000).then(result => result).catch(err => err); 
+		testReviewExists.then(result => {
+			expect(result).toEqual({status:404, msg: 'review not found'})
+		})
+	})
+	test("when passed a valid review id that exists, returns undefined", () => {
+		const testReviewExists = checkExists('reviews', 'review_id', 1).then(result => result).catch(err => err); 
+		testReviewExists.then(result => {
+			expect(result).toEqual(undefined)
+		})
+	})
+})
+
