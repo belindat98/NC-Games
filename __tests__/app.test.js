@@ -186,12 +186,12 @@ describe("/api/reviews/:review_id/comments", () => {
           expect(body.msg).toBe("Resource does not exist in reviews");
         });
     });
-    test("if valid review_id given but there are no comments for that id, returns 200 status with no comments found message", () => {
+    test("if valid review_id given but there are no comments for that id, returns 200 status with empty array", () => {
       return request(app)
         .get("/api/reviews/1/comments")
         .expect(200)
         .then(({ body }) => {
-          expect(body.msg).toBe("no comments found");
+          expect(body).toEqual({comments: []});
         });
     });
   });
