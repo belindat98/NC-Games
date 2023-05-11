@@ -31,10 +31,12 @@ exports.getCommentsByReviewId = (req, res, next) => {
     .catch(next);
 };
 
-exports.postComment = (req,res,next) => {
+exports.postComment = (req, res, next) => {
   const review_id = req.params.review_id;
   const { body, username } = req.body;
-  insertComment(review_id, body, username).then(comment => {
-    res.status(201).send({comment});
-  }).catch(next)
-}
+  insertComment(review_id, body, username)
+    .then((comment) => {
+      res.status(201).send({ comment });
+    })
+    .catch(next);
+};

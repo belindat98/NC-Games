@@ -191,31 +191,31 @@ describe("/api/reviews/:review_id/comments", () => {
         .get("/api/reviews/1/comments")
         .expect(200)
         .then(({ body }) => {
-          expect(body).toEqual({comments: []});
+          expect(body).toEqual({ comments: [] });
         });
     });
   });
   describe("POST", () => {
     test("when passed a valid body, returns 201 status and the newly posted comment, and adds comment to the database", () => {
       return request(app)
-      .post("/api/reviews/5/comments")
-      .send({username: "mallionaire", body: "wow great!"})
-      .expect(201)
-      .then(({body}) => {
-        expect(body.comment).toMatchObject({
-          comment_id: expect.any(Number),
-          body: "wow great!",
-          review_id: 5,
-          author: "mallionaire",
-          votes: 0,
-          created_at: expect.any(String)
-        })
-      })
-    })
+        .post("/api/reviews/5/comments")
+        .send({ username: "mallionaire", body: "wow great!" })
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.comment).toMatchObject({
+            comment_id: expect.any(Number),
+            body: "wow great!",
+            review_id: 5,
+            author: "mallionaire",
+            votes: 0,
+            created_at: expect.any(String),
+          });
+        });
+    });
     test("if invalid review_id given, gives 400 error and returns error message", () => {
       return request(app)
         .post("/api/reviews/hello/comments")
-        .send({username: "mallionaire", body: "hello"})
+        .send({ username: "mallionaire", body: "hello" })
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe("Invalid request!");
@@ -224,7 +224,7 @@ describe("/api/reviews/:review_id/comments", () => {
     test("if valid out of range review_id given, gives a 404 error and review not found message", () => {
       return request(app)
         .post("/api/reviews/1000/comments")
-        .send({username: "mallionaire", body: "hello"})
+        .send({ username: "mallionaire", body: "hello" })
         .expect(404)
         .then(({ body }) => {
           expect(body.msg).toBe("Resource does not exist in reviews");
@@ -232,54 +232,61 @@ describe("/api/reviews/:review_id/comments", () => {
     });
     test("if given an invalid username, returns 400 status with error message", () => {
       return request(app)
-      .post("/api/reviews/1/comments")
-      .send({username: "me", body: "hello"})
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe('Key (author)=(me) is not present in table "users".');
-      });
-    })
+        .post("/api/reviews/1/comments")
+        .send({ username: "me", body: "hello" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe(
+            'Key (author)=(me) is not present in table "users".'
+          );
+        });
+    });
     test("if not passed a username or body, will return 400 error", () => {
       return request(app)
-      .post("/api/reviews/1/comments")
-      .send({body: "hello"})
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe('missing required key');
-      });
-    })
+        .post("/api/reviews/1/comments")
+        .send({ body: "hello" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("missing required key");
+        });
+    });
     test("if passed additional invalid keys, ignores", () => {
       return request(app)
-      .post("/api/reviews/1/comments")
-      .send({body: "hello", username: "mallionaire", bananas: "oranges"})
-      .expect(201)
-      .then(({ body }) => {
-        expect(body.comment).toMatchObject({
-          comment_id: expect.any(Number),
-          body: "hello",
-          review_id: 1,
-          author: "mallionaire",
-          votes: 0,
-          created_at: expect.any(String)
-        })
-        expect(body.comment).not.toHaveProperty("bananas")
-      });
-    })
+        .post("/api/reviews/1/comments")
+        .send({ body: "hello", username: "mallionaire", bananas: "oranges" })
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.comment).toMatchObject({
+            comment_id: expect.any(Number),
+            body: "hello",
+            review_id: 1,
+            author: "mallionaire",
+            votes: 0,
+            created_at: expect.any(String),
+          });
+          expect(body.comment).not.toHaveProperty("bananas");
+        });
+    });
     test("if passed additional valid keys, ignores", () => {
       return request(app)
-      .post("/api/reviews/1/comments")
-      .send({body: "hello", username: "mallionaire", review_id: 2, votes: 5})
-      .expect(201)
-      .then(({ body }) => {
-        expect(body.comment).toMatchObject({
-          comment_id: expect.any(Number),
+        .post("/api/reviews/1/comments")
+        .send({
           body: "hello",
-          review_id: 1,
-          author: "mallionaire",
-          votes: 0,
-          created_at: expect.any(String)
+          username: "mallionaire",
+          review_id: 2,
+          votes: 5,
         })
-      });
-    })
-  })
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.comment).toMatchObject({
+            comment_id: expect.any(Number),
+            body: "hello",
+            review_id: 1,
+            author: "mallionaire",
+            votes: 0,
+            created_at: expect.any(String),
+          });
+        });
+    });
+  });
 });
