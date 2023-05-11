@@ -123,9 +123,9 @@ describe("/api/reviews", () => {
               created_at: expect.any(String),
               votes: expect.any(Number),
               designer: expect.any(String),
-              comment_count: expect.any(String)
+              comment_count: expect.any(String),
             });
-            expect(review).not.toHaveProperty("review_body")
+            expect(review).not.toHaveProperty("review_body");
           });
         });
     });
@@ -134,8 +134,65 @@ describe("/api/reviews", () => {
         .get("/api/reviews")
         .expect(200)
         .then(({ body }) => {
-          expect(body.reviews).toBeSortedBy("created_at", {descending: true})
-        })
-    })
+          expect(body.reviews).toBeSortedBy("created_at", { descending: true });
+        });
+    });
+  });
+});
+
+describe("/api/reviews/:review_id/comments", () => {
+  describe("GET", () => {
+    test("responds with an array of comments and 200 status for given review_id and each comment has correct properties", () => {
+      return request(app)
+        .get("/api/reviews/2/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments.length).toBe(3);
+          body.comments.forEach((comment) => {
+            expect(comment).toMatchObject({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              review_id: 2,
+            });
+          });
+        });
+    });
+    test("reviews are sorted by date in descending order", () => {
+      return request(app)
+        .get("/api/reviews/2/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments).toBeSortedBy("created_at", {
+            descending: true,
+          });
+        });
+    });
+    test("if invalid review_id given, gives 400 error and returns error message", () => {
+      return request(app)
+        .get("/api/reviews/hello/comments")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid request!");
+        });
+    });
+    test("if valid out of range review_id given, gives a 404 error and review not found message", () => {
+      return request(app)
+        .get("/api/reviews/10000/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("review not found");
+        });
+    });
+    test("if valid review_id given but there are no comments for that id, returns 404 error with no comments found message", () => {
+      return request(app)
+        .get("/api/reviews/1/comments")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("no comments found");
+        });
+    });
   });
 });
