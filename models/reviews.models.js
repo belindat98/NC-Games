@@ -48,3 +48,16 @@ exports.selectCommentsByReviewId = (review_id) => {
     return comments;
   });
 };
+
+exports.updateReview = (review_id, inc_votes) => {
+  return checkExists("reviews", "review_id", review_id)
+  .then(() => {
+    return db.query(`
+    UPDATE reviews 
+    SET 
+    votes = votes + $1 
+    WHERE review_id = $2 
+    RETURNING*`, [inc_votes, review_id])
+  })
+  .then(({rows}) => rows[0])
+}

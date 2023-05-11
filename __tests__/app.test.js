@@ -103,6 +103,27 @@ describe("/api/reviews/:review_id", () => {
         });
     });
   });
+  describe("PATCH", () => {
+    test("when passed a body with inc_votes property, increments the votes on the given review by that much and returns the updated review", () => {  
+      return request(app)
+      .patch("/api/reviews/1")
+      .send({inc_votes: 5})
+      .expect(201)
+      .then(({body}) => {
+        expect(body.review).toMatchObject({
+          review_id: 1,
+          title: expect.any(String),
+          review_body: expect.any(String),
+          designer: expect.any(String),
+          review_img_url: expect.any(String),
+          votes: 6,
+          category: expect.any(String),
+          owner: expect.any(String),
+          created_at: expect.any(String),
+        });
+      })
+    }) 
+  })
 });
 
 describe("/api/reviews", () => {
