@@ -48,11 +48,25 @@
         }
     }
   },
+  "POST /api/reviews/:review_id/comments": {
+    "description": "when passed an object with a body and username key, will post the new comment to the database and return the created object",
+    "queries": [],
+    "exampleResponse": {
+      "comment": {
+          "comment_id": 5,
+          "votes": 16,
+          "created_at": "2021-01-18T10:24:05.41Z",
+          "author": "mallionaire",
+          "body": "Now this is a story all about how, board games turned my life upside down",
+          "review_id": 2
+        }
+    }
+  },
   "GET /api/reviews/:review_id/comments": {
     "description": "serves an array of all comments with the given review ID sorted in reverse chronological order",
     "queries": [],
     "exampleResponse": {
-      "review": [
+      "comments": [
         {
           "comment_id": 5,
           "votes": 16,
