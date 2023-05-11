@@ -1,4 +1,5 @@
 const db = require("../db/connection");
+const { checkExists } = require("../utils/utils");
 
 exports.selectReviewById = (review_id) => {
   return db
@@ -33,4 +34,17 @@ exports.selectReviews = () => {
     .then(({ rows }) => {
       return rows;
     });
+};
+
+exports.selectCommentsByReviewId = (review_id) => {
+  return Promise.all([
+    db.query(
+      `SELECT * FROM comments WHERE review_id = $1 ORDER BY created_at DESC;`,
+      [review_id]
+    ),
+    checkExists("reviews", "review_id", review_id),
+  ]).then(([commentsQueryOutput, unusedCheckExistsOutput]) => {
+    const comments = commentsQueryOutput.rows;
+    return comments;
+  });
 };
