@@ -6,12 +6,13 @@ const {
   getReviews,
   getCommentsByReviewId,
   patchReview,
+  postComment,
 } = require("./controllers/reviews.controllers");
 const { handleCustomErrors, handlePsqlErrors } = require("./errorHandlers");
 
 const app = express();
 
-app.use(express.json())
+app.use(express.json());
 
 app.get("/api/categories", getCategories);
 
@@ -23,6 +24,7 @@ app.get("/api/reviews/:review_id", getReviewById);
 app.patch("/api/reviews/:review_id", patchReview);
 
 app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
+app.post("/api/reviews/:review_id/comments", postComment);
 
 app.get("*", (req, res) => {
   res.status(404).send({ msg: "Not found" });

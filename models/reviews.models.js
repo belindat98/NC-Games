@@ -61,3 +61,20 @@ exports.updateReview = (review_id, inc_votes) => {
   })
   .then(({rows}) => rows[0])
 }
+
+exports.insertComment = (review_id, body, username) => {
+  return checkExists("reviews", "review_id", review_id)
+    .then(() => {
+      return db.query(
+        `INSERT INTO comments
+          (review_id, body, author)
+          VALUES
+          ($1, $2, $3)
+          RETURNING*`,
+        [review_id, body, username]
+      );
+    })
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
