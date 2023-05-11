@@ -46,7 +46,7 @@ exports.selectCommentsByReviewId = (review_id) => {
   ]).then(([commentsQueryOutput, unusedCheckExistsOutput]) => {
     const comments = commentsQueryOutput.rows;
     if (comments.length === 0) {
-      return Promise.reject({ status: 404, msg: "no comments found" });
+      return Promise.reject({ status: 200, msg: "no comments found" });
     }
     return comments;
   });
