@@ -183,7 +183,7 @@ describe("/api/reviews/:review_id/comments", () => {
         .get("/api/reviews/10000/comments")
         .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe("review not found");
+          expect(body.msg).toBe("Resource does not exist in reviews");
         });
     });
     test("if valid review_id given but there are no comments for that id, returns 404 error with no comments found message", () => {
