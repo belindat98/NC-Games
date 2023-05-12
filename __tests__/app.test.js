@@ -103,6 +103,74 @@ describe("/api/reviews/:review_id", () => {
         });
     });
   });
+  describe("PATCH", () => {
+    test("when passed a body with inc_votes property, increments the votes on the given review by that much and returns the updated review", () => {  
+      return request(app)
+      .patch("/api/reviews/1")
+      .send({inc_votes: 5})
+      .expect(200)
+      .then(({body}) => {
+        expect(body.review).toMatchObject({
+          review_id: 1,
+          title: expect.any(String),
+          review_body: expect.any(String),
+          designer: expect.any(String),
+          review_img_url: expect.any(String),
+          votes: 6,
+          category: expect.any(String),
+          owner: expect.any(String),
+          created_at: expect.any(String),
+        });
+      })
+    }) 
+    test("if invalid review_id given, gives 400 error and returns error message", () => {
+      return request(app)
+        .patch("/api/reviews/hello")
+        .send({ inc_votes: 5 })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid request!");
+        });
+    });
+    test("if valid out of range review_id given, gives a 404 error and review not found message", () => {
+      return request(app)
+        .patch("/api/reviews/1000")
+        .send({ inc_votes: 5 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Resource does not exist in reviews");
+        });
+    });
+    test("if inc_votes property not given, returns 400 status and error message", () => {
+      return request(app)
+      .patch("/api/reviews/1")
+      .send({ a: "b" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("missing required key");
+      });
+    })
+    test("if passed additional keys, ignores", () => {
+      return request(app)
+        .patch("/api/reviews/1")
+        .send({ inc_votes: 5, title: "bananas", "apples": "pears", owner: "me"})
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.review).toMatchObject({
+            review_id: 1,
+            title: expect.not.stringMatching("bananas"),
+            review_body: expect.any(String),
+            designer: expect.any(String),
+            review_img_url: expect.any(String),
+            votes: 6,
+            category: expect.any(String),
+            owner: expect.not.stringMatching("me"),
+            created_at: expect.any(String),
+          });
+          expect(body.review).not.toHaveProperty("apples");
+        });
+    });
+  })
 });
 
 describe("/api/reviews", () => {

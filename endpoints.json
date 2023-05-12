@@ -47,6 +47,23 @@
           "comment_count": 6
         }
     }
+  }
+  ,
+  "PATCH /api/reviews/:review_id": {
+    "description": "when passed an object with inc_votes key, will increment the votes on the given review by given amount and serves an object with the updated review",
+    "queries": [],
+    "exampleResponse": {
+      "review": {
+          "title": "One Night Ultimate Werewolf",
+          "designer": "Akihisa Okui",
+          "owner": "happyamy2016",
+          "review_img_url": "https://images.pexels.com/photos/5350049/pexels-photo-5350049.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+          "category": "hidden-roles",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 5,
+          "comment_count": 6
+        }
+    }
   },
   "POST /api/reviews/:review_id/comments": {
     "description": "when passed an object with a body and username key, will post the new comment to the database and return the created object",
