@@ -13,23 +13,41 @@ exports.selectReviewById = (review_id) => {
     });
 };
 
-exports.selectReviews = () => {
+exports.selectReviews = (category, sort_by = "created_at", order = "DESC") => {
+  const validSorts = ["owner", "title", "review_id", "category", "created_at", "votes", "designer"]
+  const validSortOrders = ["asc", "ASC", "desc", "DESC"]
+  const queryValues = [];
+  let queryStr = `SELECT 
+  reviews.owner, 
+  reviews.title, 
+  reviews.review_id, 
+  reviews.category, 
+  reviews.review_img_url, 
+  reviews.created_at, 
+  reviews.votes, 
+  reviews.designer, 
+  COUNT(comment_id) AS comment_count 
+  FROM reviews 
+  LEFT JOIN comments ON reviews.review_id = comments.review_id 
+`
+if (category) {
+  queryStr += ` WHERE category = $1`
+  queryValues.push(category)
+}
+
+if (!validSorts.includes(sort_by)) {
+  return Promise.reject({status: 400, msg: "Invalid sort query"})
+}
+
+if (!validSortOrders.includes(order)) {
+  return Promise.reject({status: 400, msg: "Invalid sort order"})
+}
+
+queryStr += ` GROUP BY reviews.review_id
+ORDER BY reviews.${sort_by} ${order};
+`
   return db
-    .query(
-      `SELECT 
-      reviews.owner, 
-      reviews.title, 
-      reviews.review_id, 
-      reviews.category, 
-      reviews.review_img_url, 
-      reviews.created_at, 
-      reviews.votes, 
-      reviews.designer, 
-      COUNT(comment_id) AS comment_count 
-      FROM reviews 
-      LEFT JOIN comments ON reviews.review_id = comments.review_id 
-      GROUP BY reviews.review_id
-      ORDER BY reviews.created_at DESC;`
+    .query(queryStr, queryValues
     )
     .then(({ rows }) => {
       return rows;
