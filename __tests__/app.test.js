@@ -108,7 +108,7 @@ describe("/api/reviews/:review_id", () => {
       return request(app)
       .patch("/api/reviews/1")
       .send({inc_votes: 5})
-      .expect(201)
+      .expect(200)
       .then(({body}) => {
         expect(body.review).toMatchObject({
           review_id: 1,
@@ -154,7 +154,7 @@ describe("/api/reviews/:review_id", () => {
       return request(app)
         .patch("/api/reviews/1")
         .send({ inc_votes: 5, title: "bananas", "apples": "pears", owner: "me"})
-        .expect(201)
+        .expect(200)
         .then(({ body }) => {
           expect(body.review).toMatchObject({
             review_id: 1,
