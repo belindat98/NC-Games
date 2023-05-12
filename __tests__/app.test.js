@@ -378,3 +378,36 @@ describe("/api/users", () => {
     });
   });
 });
+
+describe("/api/comments/:comment_id", () => {
+  describe("DELETE", () => {
+    test("when given a valid comment_id deletes the comment and returns 204 status and no content", () => {
+      return request(app)
+        .delete("/api/comments/1")
+        .expect(204)
+        .then(({ body }) => {
+          expect(body).toEqual({});
+          return db.query(`SELECT * FROM comments WHERE comment_id = 1`);
+        })
+        .then(({ rows }) => {
+          expect(rows.length).toBe(0);
+        });
+    });
+    test("if invalid comment_id given, gives 400 error and returns error message", () => {
+      return request(app)
+        .delete("/api/comments/hello")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid request!");
+        });
+    });
+    test("if valid out of range comment_id given, gives a 204 status", () => {
+      return request(app)
+        .delete("/api/comments/10000")
+        .expect(204)
+        .then(({ body }) => {
+          expect(body).toEqual({});
+        });
+    });
+  });
+});

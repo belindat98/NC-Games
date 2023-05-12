@@ -140,5 +140,10 @@
         }
       ]
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes the given comment and doesn't return content",
+    "queries": [],
+    "exampleResponse": {}
   }
 }
