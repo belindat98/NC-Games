@@ -9,6 +9,7 @@ const {
   postComment,
 } = require("./controllers/reviews.controllers");
 const { handleCustomErrors, handlePsqlErrors } = require("./errorHandlers");
+const { deleteComment } = require("./controllers/comments.controllers");
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.patch("/api/reviews/:review_id", patchReview);
 
 app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
 app.post("/api/reviews/:review_id/comments", postComment);
+
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.get("*", (req, res) => {
   res.status(404).send({ msg: "Not found" });

@@ -104,25 +104,25 @@ describe("/api/reviews/:review_id", () => {
     });
   });
   describe("PATCH", () => {
-    test("when passed a body with inc_votes property, increments the votes on the given review by that much and returns the updated review", () => {  
+    test("when passed a body with inc_votes property, increments the votes on the given review by that much and returns the updated review", () => {
       return request(app)
-      .patch("/api/reviews/1")
-      .send({inc_votes: 5})
-      .expect(200)
-      .then(({body}) => {
-        expect(body.review).toMatchObject({
-          review_id: 1,
-          title: expect.any(String),
-          review_body: expect.any(String),
-          designer: expect.any(String),
-          review_img_url: expect.any(String),
-          votes: 6,
-          category: expect.any(String),
-          owner: expect.any(String),
-          created_at: expect.any(String),
+        .patch("/api/reviews/1")
+        .send({ inc_votes: 5 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.review).toMatchObject({
+            review_id: 1,
+            title: expect.any(String),
+            review_body: expect.any(String),
+            designer: expect.any(String),
+            review_img_url: expect.any(String),
+            votes: 6,
+            category: expect.any(String),
+            owner: expect.any(String),
+            created_at: expect.any(String),
+          });
         });
-      })
-    }) 
+    });
     test("if invalid review_id given, gives 400 error and returns error message", () => {
       return request(app)
         .patch("/api/reviews/hello")
@@ -143,17 +143,17 @@ describe("/api/reviews/:review_id", () => {
     });
     test("if inc_votes property not given, returns 400 status and error message", () => {
       return request(app)
-      .patch("/api/reviews/1")
-      .send({ a: "b" })
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe("missing required key");
-      });
-    })
+        .patch("/api/reviews/1")
+        .send({ a: "b" })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("missing required key");
+        });
+    });
     test("if passed additional keys, ignores", () => {
       return request(app)
         .patch("/api/reviews/1")
-        .send({ inc_votes: 5, title: "bananas", "apples": "pears", owner: "me"})
+        .send({ inc_votes: 5, title: "bananas", apples: "pears", owner: "me" })
         .expect(200)
         .then(({ body }) => {
           expect(body.review).toMatchObject({
@@ -170,7 +170,7 @@ describe("/api/reviews/:review_id", () => {
           expect(body.review).not.toHaveProperty("apples");
         });
     });
-  })
+  });
 });
 
 describe("/api/reviews", () => {
@@ -354,6 +354,39 @@ describe("/api/reviews/:review_id/comments", () => {
             votes: 0,
             created_at: expect.any(String),
           });
+        });
+    });
+  });
+});
+
+describe("/api/comments/:comment_id", () => {
+  describe("DELETE", () => {
+    test("when given a valid comment_id deletes the comment and returns 204 status and no content", () => {
+      return request(app)
+        .delete("/api/comments/1")
+        .expect(204)
+        .then(({ body }) => {
+          expect(body).toEqual({});
+          return db.query(`SELECT * FROM comments WHERE comment_id = 1`);
+        })
+        .then(({ rows }) => {
+          expect(rows.length).toBe(0);
+        });
+    });
+    test("if invalid comment_id given, gives 400 error and returns error message", () => {
+      return request(app)
+        .delete("/api/comments/hello")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Invalid request!");
+        });
+    });
+    test("if valid out of range comment_id given, gives a 204 status", () => {
+      return request(app)
+        .delete("/api/comments/10000")
+        .expect(204)
+        .then(({ body }) => {
+          expect(body).toEqual({});
         });
     });
   });
