@@ -83,7 +83,7 @@ describe("/api/reviews/:review_id", () => {
             category: expect.any(String),
             owner: expect.any(String),
             created_at: expect.any(String),
-            comment_count: "3"
+            comment_count: 3
           });
         });
     });
@@ -192,7 +192,7 @@ describe("/api/reviews", () => {
               created_at: expect.any(String),
               votes: expect.any(Number),
               designer: expect.any(String),
-              comment_count: expect.any(String),
+              comment_count: expect.any(Number),
             });
             expect(review).not.toHaveProperty("review_body");
           });

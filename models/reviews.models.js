@@ -3,7 +3,7 @@ const { checkExists } = require("../utils/utils");
 
 exports.selectReviewById = (review_id) => {
   return db
-    .query(`SELECT reviews.*, COUNT(comment_id) AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id WHERE reviews.review_id = $1 GROUP BY reviews.review_id`, [review_id])
+    .query(`SELECT reviews.*, CAST(COUNT(comment_id) AS int) AS comment_count FROM reviews LEFT JOIN comments ON reviews.review_id = comments.review_id WHERE reviews.review_id = $1 GROUP BY reviews.review_id`, [review_id])
     .then(({ rows }) => {
       const review = rows[0];
       if (!review) {
@@ -25,7 +25,7 @@ exports.selectReviews = () => {
       reviews.created_at, 
       reviews.votes, 
       reviews.designer, 
-      COUNT(comment_id) AS comment_count 
+      CAST(COUNT(comment_id) AS int) AS comment_count 
       FROM reviews 
       LEFT JOIN comments ON reviews.review_id = comments.review_id 
       GROUP BY reviews.review_id
