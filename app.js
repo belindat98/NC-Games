@@ -10,6 +10,7 @@ const {
 } = require("./controllers/reviews.controllers");
 const { handleCustomErrors, handlePsqlErrors } = require("./errorHandlers");
 const { deleteComment } = require("./controllers/comments.controllers");
+const { getUsers } = require("./controllers/users.controllers");
 
 const app = express();
 
@@ -26,6 +27,8 @@ app.patch("/api/reviews/:review_id", patchReview);
 
 app.get("/api/reviews/:review_id/comments", getCommentsByReviewId);
 app.post("/api/reviews/:review_id/comments", postComment);
+
+app.get("/api/users", getUsers);
 
 app.delete("/api/comments/:comment_id", deleteComment);
 
