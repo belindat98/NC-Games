@@ -14,44 +14,51 @@ exports.selectReviewById = (review_id) => {
 };
 
 exports.selectReviews = (category, sort_by = "created_at", order = "DESC") => {
-  const validSorts = ["owner", "title", "review_id", "category", "created_at", "votes", "designer"]
-  const validSortOrders = ["asc", "ASC", "desc", "DESC"]
+  const validSorts = [
+    "owner",
+    "title",
+    "review_id",
+    "category",
+    "created_at",
+    "votes",
+    "designer",
+  ];
+  const validSortOrders = ["asc", "ASC", "desc", "DESC"];
   const queryValues = [];
   let queryStr = `SELECT 
-  reviews.owner, 
-  reviews.title, 
-  reviews.review_id, 
-  reviews.category, 
-  reviews.review_img_url, 
-  reviews.created_at, 
-  reviews.votes, 
-  reviews.designer, 
-  COUNT(comment_id) AS comment_count 
-  FROM reviews 
-  LEFT JOIN comments ON reviews.review_id = comments.review_id 
-`
-if (category) {
-  queryStr += ` WHERE category = $1`
-  queryValues.push(category)
-}
+      reviews.owner, 
+      reviews.title, 
+      reviews.review_id, 
+      reviews.category, 
+      reviews.review_img_url, 
+      reviews.created_at, 
+      reviews.votes, 
+      reviews.designer, 
+      COUNT(comment_id) AS comment_count 
+      FROM reviews 
+      LEFT JOIN comments ON reviews.review_id = comments.review_id 
+      `;
 
-if (!validSorts.includes(sort_by)) {
-  return Promise.reject({status: 400, msg: "Invalid sort query"})
-}
+  if (category) {
+    queryStr += ` WHERE category LIKE $1`;
+    queryValues.push(category);
+  }
 
-if (!validSortOrders.includes(order)) {
-  return Promise.reject({status: 400, msg: "Invalid sort order"})
-}
+  if (!validSorts.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "Invalid sort query" });
+  }
 
-queryStr += ` GROUP BY reviews.review_id
-ORDER BY reviews.${sort_by} ${order};
-`
-  return db
-    .query(queryStr, queryValues
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+  if (!validSortOrders.includes(order)) {
+    return Promise.reject({ status: 400, msg: "Invalid sort order" });
+  }
+
+  queryStr += ` GROUP BY reviews.review_id
+      ORDER BY reviews.${sort_by} ${order};
+      `;
+  return db.query(queryStr, queryValues)
+  .then(({rows}) => {
+    return rows;
+  });
 };
 
 exports.selectCommentsByReviewId = (review_id) => {
@@ -69,16 +76,19 @@ exports.selectCommentsByReviewId = (review_id) => {
 
 exports.updateReview = (review_id, inc_votes) => {
   return checkExists("reviews", "review_id", review_id)
-  .then(() => {
-    return db.query(`
+    .then(() => {
+      return db.query(
+        `
     UPDATE reviews 
     SET 
     votes = votes + $1 
     WHERE review_id = $2 
-    RETURNING*`, [inc_votes, review_id])
-  })
-  .then(({rows}) => rows[0])
-}
+    RETURNING*`,
+        [inc_votes, review_id]
+      );
+    })
+    .then(({ rows }) => rows[0]);
+};
 
 exports.insertComment = (review_id, body, username) => {
   return checkExists("reviews", "review_id", review_id)

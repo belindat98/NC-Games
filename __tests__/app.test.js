@@ -216,6 +216,15 @@ describe("/api/reviews", () => {
         })
       })
     })
+    test("if valid category given but there are no reviews for that category, returns an empty array", () =>{
+      return request(app)
+      .get("/api/reviews?category=children's games")
+      .expect(200)
+      .then(({body}) => {
+        expect(body).toEqual({reviews: []})
+      })
+    })
+    })
     test("reviews can be sorted by any valid column", () => {
       return request(app)
         .get("/api/reviews?sort_by=votes")
@@ -242,14 +251,13 @@ describe("/api/reviews", () => {
     });
     test("if invalid sort order given, returns 400 error and error message", () => {
       return request(app)
-        .get("/api/reviews?sort_by=votes&order=hello")
+        .get("/api/reviews?order=hello")
         .expect(400)
         .then(({ body }) => {
           expect(body.msg).toBe("Invalid sort order");
         });
     });
   });
-});
 
 describe("/api/reviews/:review_id/comments", () => {
   describe("GET", () => {
