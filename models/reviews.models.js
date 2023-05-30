@@ -13,10 +13,19 @@ exports.selectReviewById = (review_id) => {
     });
 };
 
-exports.selectReviews = () => {
-  return db
-    .query(
-      `SELECT 
+exports.selectReviews = (category, sort_by = "created_at", order = "DESC") => {
+  const validSorts = [
+    "owner",
+    "title",
+    "review_id",
+    "category",
+    "created_at",
+    "votes",
+    "designer",
+  ];
+  const validSortOrders = ["asc", "ASC", "desc", "DESC"];
+  const queryValues = [];
+  let queryStr = `SELECT 
       reviews.owner, 
       reviews.title, 
       reviews.review_id, 
@@ -28,12 +37,28 @@ exports.selectReviews = () => {
       COUNT(comment_id) AS comment_count 
       FROM reviews 
       LEFT JOIN comments ON reviews.review_id = comments.review_id 
-      GROUP BY reviews.review_id
-      ORDER BY reviews.created_at DESC;`
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+      `;
+
+  if (category) {
+    queryStr += ` WHERE category LIKE $1`;
+    queryValues.push(category);
+  }
+
+  if (!validSorts.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "Invalid sort query" });
+  }
+
+  if (!validSortOrders.includes(order)) {
+    return Promise.reject({ status: 400, msg: "Invalid sort order" });
+  }
+
+  queryStr += ` GROUP BY reviews.review_id
+      ORDER BY reviews.${sort_by} ${order};
+      `;
+  return db.query(queryStr, queryValues)
+  .then(({rows}) => {
+    return rows;
+  });
 };
 
 exports.selectCommentsByReviewId = (review_id) => {
@@ -51,16 +76,19 @@ exports.selectCommentsByReviewId = (review_id) => {
 
 exports.updateReview = (review_id, inc_votes) => {
   return checkExists("reviews", "review_id", review_id)
-  .then(() => {
-    return db.query(`
+    .then(() => {
+      return db.query(
+        `
     UPDATE reviews 
     SET 
     votes = votes + $1 
     WHERE review_id = $2 
-    RETURNING*`, [inc_votes, review_id])
-  })
-  .then(({rows}) => rows[0])
-}
+    RETURNING*`,
+        [inc_votes, review_id]
+      );
+    })
+    .then(({ rows }) => rows[0]);
+};
 
 exports.insertComment = (review_id, body, username) => {
   return checkExists("reviews", "review_id", review_id)
