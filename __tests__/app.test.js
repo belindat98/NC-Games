@@ -70,11 +70,11 @@ describe("/api/reviews/:review_id", () => {
   describe("GET", () => {
     test("responds with review object with correct properties and status 200", () => {
       return request(app)
-        .get("/api/reviews/1")
+        .get("/api/reviews/3")
         .expect(200)
         .then(({ body }) => {
-          expect(body.review.review_id).toBe(1);
           expect(body.review).toMatchObject({
+            review_id: 3,
             title: expect.any(String),
             review_body: expect.any(String),
             designer: expect.any(String),
@@ -83,6 +83,7 @@ describe("/api/reviews/:review_id", () => {
             category: expect.any(String),
             owner: expect.any(String),
             created_at: expect.any(String),
+            comment_count: 3
           });
         });
     });
@@ -191,7 +192,7 @@ describe("/api/reviews", () => {
               created_at: expect.any(String),
               votes: expect.any(Number),
               designer: expect.any(String),
-              comment_count: expect.any(String),
+              comment_count: expect.any(Number),
             });
             expect(review).not.toHaveProperty("review_body");
           });
