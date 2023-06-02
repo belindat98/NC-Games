@@ -22,6 +22,7 @@ exports.selectReviews = (category, sort_by = "created_at", order = "DESC") => {
     "created_at",
     "votes",
     "designer",
+    "comment_count"
   ];
   const validSortOrders = ["asc", "ASC", "desc", "DESC"];
   const queryValues = [];
