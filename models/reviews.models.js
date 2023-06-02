@@ -54,7 +54,7 @@ exports.selectReviews = (category, sort_by = "created_at", order = "DESC") => {
   }
 
   queryStr += ` GROUP BY reviews.review_id
-      ORDER BY reviews.${sort_by} ${order};
+      ORDER BY ${sort_by} ${order};
       `;
   return db.query(queryStr, queryValues)
   .then(({rows}) => {
